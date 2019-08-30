@@ -1121,6 +1121,8 @@ void setRotation(uint8_t dir)
 #if defined(SCREEN_TYPE_ADAFRUIT_16x8_BACKPACK) || defined(SCREEN_TYPE_ADAFRUIT_8x8_BACKPACK) || defined(SCREEN_TYPE_ADAFRUIT_16x8_FEATHERWING_BACKPACK)
 void sendMatrix(unsigned char* matrix, unsigned char* matrix2)
     {
+
+      /*
     // rotate as necessary
 #if defined(SCREEN_TYPE_ADAFRUIT_16x8_BACKPACK) || defined(SCREEN_TYPE_ADAFRUIT_16x8_FEATHERWING_BACKPACK)
     uint8_t mat[8];
@@ -1156,7 +1158,7 @@ void sendMatrix(unsigned char* matrix, unsigned char* matrix2)
 #if defined(SCREEN_TYPE_ADAFRUIT_16x8_BACKPACK)    // note we're NOT flipping them
         matrix = mat;  
         matrix2 = mat2;
-#else									// here we ARE flipping them
+#else                                   // here we ARE flipping them
         matrix2 = mat;  
         matrix = mat2;
 #endif
@@ -1170,10 +1172,29 @@ void sendMatrix(unsigned char* matrix, unsigned char* matrix2)
         matrix = mat;
         }       
 #endif
+*/
+uint8_t mat[8];
+uint8_t mat2[8];
+memcpy(mat, matrix, 8);
+memcpy(mat2, matrix2, 8);
+
+rotateMatrix(mat, DIR_180);
+rotateMatrix(mat2, DIR_180);
+
+matrix = mat;  
+matrix2 = mat2;
 
     Wire.beginTransmission(I2C_ADDRESS);
     Wire.write(0);
 
+    for (uint8_t i=0; i<8; i++) 
+        {
+        Wire.write(matrix2[7-i]);    
+        Wire.write(matrix[7-i]);    
+        }
+
+        
+/*
 #if defined(SCREEN_TYPE_ADAFRUIT_16x8_BACKPACK) || defined(SCREEN_TYPE_ADAFRUIT_16x8_FEATHERWING_BACKPACK)
     for (uint8_t i=0; i<8; i++) 
         {
@@ -1192,6 +1213,7 @@ void sendMatrix(unsigned char* matrix, unsigned char* matrix2)
         Wire.write(matrix[i]); 
         }        
 #endif  // defined(SCREEN_TYPE_ADAFRUIT_8x8_BACKPACK)
+*/
     Wire.endTransmissionNonblocking();  
     blinkToggle++;
     if (blinkToggle > blinkOff)
@@ -2092,7 +2114,6 @@ void setScreenBrightness(uint8_t brightness)
 #endif
  
     }
-
 
 
 
